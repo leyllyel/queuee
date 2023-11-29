@@ -24,69 +24,36 @@ public class Main {
                 }
             }
         });
-
-        Thread threadA = new Thread(() -> {
-            int maxCount = 0;
-            String maxText = "";
-            try {
-                while (true) {
-                    String text = queueA.take();
-                    int count = countCharacter(text, 'a');
-                    if (count > maxCount) {
-                        maxCount = count;
-                        maxText = text;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Максимальное количество символов 'a' в строке: " + maxCount);
-            System.out.println(maxText);
-        });
-
-        Thread threadB = new Thread(() -> {
-            int maxCount = 0;
-            String maxText = "";
-            try {
-                while (true) {
-                    String text = queueB.take();
-                    int count = countCharacter(text, 'b');
-                    if (count > maxCount) {
-                        maxCount = count;
-                        maxText = text;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Максимальное количество символов 'b' в строке: " + maxCount);
-            System.out.println(maxText);
-        });
-
-        Thread threadC = new Thread(() -> {
-            int maxCount = 0;
-            String maxText = "";
-            try {
-                while (true) {
-                    String text = queueC.take();
-                    int count = countCharacter(text, 'c');
-                    if (count > maxCount) {
-                        maxCount = count;
-                        maxText = text;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Максимальное количество символов 'c' в строке: " + maxCount);
-            System.out.println(maxText);
-        });
-
+        Thread threadA = createCountThread(queueA, 'a');
+        Thread threadB = createCountThread(queueB, 'b');
+        Thread threadC = createCountThread(queueC, 'c');
         generatorThread.start();
         threadA.start();
         threadB.start();
         threadC.start();
     }
+
+    private static Thread createCountThread(ArrayBlockingQueue<String> queue, char character) {
+        return new Thread(() -> {
+            int maxCount = 0;
+            String maxText = "";
+            try {
+                while (true) {
+                    String text = queue.take();
+                    int count = countCharacter(text, character);
+                    if (count > maxCount) {
+                        maxCount = count;
+                        maxText = text;
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Максимальное количество символов '" + character + "' в строке: " + maxCount);
+            System.out.println(maxText);
+        });
+    }
+
     private static int countCharacter(String text, char ch) {
         int count = 0;
         for (int i = 0; i < text.length(); i++) {
